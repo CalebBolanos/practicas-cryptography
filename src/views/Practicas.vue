@@ -55,44 +55,11 @@
 
     <!-- Sizes your content based upon application components -->
     <v-main class="grey lighten-3 ma-0 pa-0">
-      <section style="background-color: white">
-        <v-layout column align-center justify-center>
-          <strong style="color: #2c3e50; font-weight: 600; font-size: 3rem">
-            Prácticas de Cryptography
-          </strong>
-          <div class="" style="color: #6a8bad; font-size: 1.6rem">
-            Caleb Salomón Bolaños Ramos - 3CM14
-          </div>
-        </v-layout>
-      </section>
+      
       <!-- Provides the application the proper gutter -->
-      <v-container>
-        <router-view></router-view>
-      </v-container>
+      <router-view></router-view>
     </v-main>
-    <v-footer color="primary " padless>
-      <v-row justify="center" no-gutters align="center">
-        <v-col class="py-4 px-5 text-center white--text" cols="4">
-          <strong>Prácticas de Cryptography</strong><br />
-          <strong>3CM14</strong>
-        </v-col>
-        <v-col class="py-4 white--text text-center" cols="4">
-          <span>Hecho con ❤️ por:</span><br />
-          <strong>Caleb Salomón Bolaños Ramos</strong><br />
-        </v-col>
-        <v-col class="py-4 white--text text-center" cols="4">
-          <v-btn v-for="icon in icons" :key="icon" class="mx-4" dark icon>
-            <v-icon size="24px">
-              {{ icon }}
-            </v-icon>
-          </v-btn>
-        </v-col>
-
-        <v-col class="secondary py-4 text-center white--text" cols="12">
-          {{ new Date().getFullYear() }} — <strong>ESCOM IPN</strong>
-        </v-col>
-      </v-row>
-    </v-footer>
+    
   </v-main>
 </template>
 

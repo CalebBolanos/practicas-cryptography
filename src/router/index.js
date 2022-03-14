@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Practicas from '@/views/Practicas.vue'
 import Inicio from '@/views/Inicio.vue'
+import Practica1 from '@/views/practicas/Practica1.vue'
 
 Vue.use(VueRouter)
 
@@ -22,6 +23,11 @@ const routes = [
         path: 'inicio',
         name: 'Inicio',
         component: Inicio
+      },
+      {
+        path: 'practica1',
+        name: 'Practica1',
+        component: Practica1
       },
     ],
   },
