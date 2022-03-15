@@ -22,12 +22,18 @@ const routes = [
       {
         path: 'inicio',
         name: 'Inicio',
-        component: Inicio
+        component: Inicio,
+        meta: {
+          title: 'Inicio'
+        }
       },
       {
         path: 'practica1',
         name: 'Practica1',
-        component: Practica1
+        component: Practica1,
+        meta: {
+          title: 'Práctica 1'
+        }
       },
     ],
   },

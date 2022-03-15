@@ -11,12 +11,7 @@
       </v-list-item>
       <v-divider></v-divider>
       <v-list nav>
-        <v-list-item-group
-          v-model="seleccionado"
-          mandatory
-          active-class="seleccionado"
-          color="primary"
-        >
+        <v-list-item-group v-model="seleccionado" mandatory  color="primary">
           <v-list-item v-for="(item, i) in items" :key="i" :to="item.link">
             <v-list-item-icon>
               <v-icon v-text="item.icon"></v-icon>
@@ -32,7 +27,7 @@
     <v-app-bar app  class="blur" elevate-on-scroll>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <v-toolbar-title>{{ items[seleccionado].text }}</v-toolbar-title>
+      <v-toolbar-title>{{ titulo }}</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -59,7 +54,6 @@
       <!-- Provides the application the proper gutter -->
       <router-view></router-view>
     </v-main>
-    
   </v-main>
 </template>
 
@@ -69,17 +63,31 @@ export default {
   data: () => ({
     drawer: false,
     group: null,
-    seleccionado: 0,
     items: [
       {
         icon: "mdi-home",
         text: "Inicio",
         link: { name: "Inicio" },
       },
+      {
+        icon: "mdi-tag",
+        text: "Práctica 1",
+        link: { name: "Practica1" },
+      },
+      
     ],
-    icons: ["mdi-facebook", "mdi-twitter", "mdi-linkedin", "mdi-instagram"],
+    seleccionado: 0,
+    titulo: '',
   }),
   methods: {},
+  watch:{
+    '$route' (to){
+      this.titulo = to.meta.title
+      this.seleccionado = this.items.findIndex(objeto =>{
+        return objeto.text == to.meta.title
+      })
+    }
+  },
 };
 </script>
 
