@@ -42,13 +42,21 @@
                 ></v-text-field>
               </v-col>
             </v-row>
-            <v-text-field
-              v-model="plaintext"
-              prepend-inner-icon="mdi-text-box-outline"
-              label="Mensaje"
-              type="text"
+            <v-file-input
+              label="Archivo a cifrar"
               outlined
-            ></v-text-field>
+              accept=".txt"
+              @change="leerArchivoCifrar"
+            ></v-file-input>
+            <v-textarea
+              v-model="plaintext"
+              label="Contenido del archivo a cifrar"
+              auto-grow
+              rows="3"
+              outlined
+              readonly
+            ></v-textarea>
+            
 
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -101,13 +109,22 @@
                 ></v-text-field>
               </v-col>
             </v-row>
-            <v-text-field
-              v-model="cifrado"
-              prepend-inner-icon="mdi-text-box-outline"
-              label="Mensaje"
-              type="text"
+
+            <v-file-input
+              label="Archivo a descifrar"
               outlined
-            ></v-text-field>
+              accept=".txt"
+              @change="leerArchivoDescifrar"
+            ></v-file-input>
+
+            <v-textarea
+              v-model="cifrado"
+              label="Contenido del archivo a descifrar"
+              auto-grow
+              rows="3"
+              readonly
+              outlined
+            ></v-textarea>
 
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -194,14 +211,16 @@ export default {
     alfabetoCifrar: "1",
     alphaCifrar: 3,
     betaCifrar: 2,
-    plaintext: "cryptography class",
+    plaintext: "",
     mensajeCifrado: "",
 
     alfabetoDescifrar: "1",
     alphaDescifrar: 3,
     betaDescifrar: 2,
-    cifrado: "cryptography class",
+    cifrado: "",
     mensajeDescifrado: "",
+
+    contenidoArchivo: null,
   }),
 
   methods: {
@@ -209,6 +228,9 @@ export default {
       let alfabeto = this.obtenerAlfabeto(this.alfabetoCifrar);
       if (this.MCDeuclides(this.alphaCifrar, alfabeto.length) === 1) {
         //pasamos el mensaje a minusculas y quitamos los espacios
+        this.plaintext = this.contenidoArchivo;
+        console.log(this.plaintext);
+
         let texto = this.plaintext.toUpperCase().replace(/\s+/g, "");
 
         this.mensajeCifrado = this.cifrar(
@@ -217,6 +239,11 @@ export default {
           texto,
           alfabeto
         );
+        this.crearArchivo("cifrado.txt", this.mensajeCifrado);
+      } else {
+        alert(
+          "El factor multiplicativo de alfa no es valido ya que no es coprimo. Intenta con otro valor"
+        );
       }
     },
 
@@ -224,9 +251,23 @@ export default {
       let alfabeto = this.obtenerAlfabeto(this.alfabetoDescifrar);
       if (this.MCDeuclides(this.alphaDescifrar, alfabeto.length) === 1) {
         //pasamos el mensaje a minusculas y quitamos los espacios
-        let alfaInversa = this.inversoMultiplicativoModular(parseInt(this.alphaDescifrar), alfabeto.length)
-        console.log(alfaInversa)
-        this.mensajeDescifrado = this.descifrar(alfaInversa, parseInt(this.betaDescifrar), this.cifrado, alfabeto)
+        let alfaInversa = this.inversoMultiplicativoModular(
+          parseInt(this.alphaDescifrar),
+          alfabeto.length
+        );
+        console.log(alfaInversa);
+        this.cifrado = this.contenidoArchivo;
+        this.mensajeDescifrado = this.descifrar(
+          alfaInversa,
+          parseInt(this.betaDescifrar),
+          this.cifrado,
+          alfabeto
+        );
+        this.crearArchivo("descifrado.txt", this.mensajeDescifrado);
+      } else {
+        alert(
+          "El inverso multiplicativo no existe para el valor de alfa dado. Intenta con otro valor"
+        );
       }
     },
 
@@ -248,9 +289,10 @@ export default {
       let plaintext = "";
       for (let i = 0; i < mensajeCifrado.length; i++) {
         let posicionLetra = alfabeto.indexOf(mensajeCifrado[i]);
-        let transformacion = (alfaInversa * (posicionLetra - betaInversa)) % alfabeto.length;
-        if(transformacion < 0){
-          transformacion += alfabeto.length
+        let transformacion =
+          (alfaInversa * (posicionLetra - betaInversa)) % alfabeto.length;
+        if (transformacion < 0) {
+          transformacion += alfabeto.length;
         }
         plaintext += alfabeto[transformacion];
       }
@@ -297,6 +339,54 @@ export default {
       if (x < 0) x += m0;
 
       return x;
+    },
+
+    leerArchivoCifrar(archivo) {
+      if (!archivo) {
+        this.contenidoArchivo = "No File Chosen";
+        return
+      }
+      let reader = new FileReader();
+
+      // Use the javascript reader object to load the contents
+      // of the file in the v-model prop
+      reader.readAsText(archivo);
+      reader.onload = () => {
+        this.contenidoArchivo = reader.result;
+        this.plaintext = this.contenidoArchivo
+      };
+    },
+
+    leerArchivoDescifrar(archivo) {
+      if (!archivo) {
+        this.contenidoArchivo = "No File Chosen";
+        return
+      }
+      let reader = new FileReader();
+
+      // Use the javascript reader object to load the contents
+      // of the file in the v-model prop
+      reader.readAsText(archivo);
+      reader.onload = () => {
+        this.contenidoArchivo = reader.result;
+        this.cifrado = this.contenidoArchivo
+      };
+    },
+
+    crearArchivo(nombreArchivo, texto) {
+      var element = document.createElement("a");
+      element.setAttribute(
+        "href",
+        "data:text/plain;charset=utf-8," + encodeURIComponent(texto)
+      );
+      element.setAttribute("download", nombreArchivo);
+
+      element.style.display = "none";
+      document.body.appendChild(element);
+
+      element.click();
+
+      document.body.removeChild(element);
     },
   },
 };
