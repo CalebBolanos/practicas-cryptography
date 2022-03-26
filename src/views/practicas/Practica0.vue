@@ -2,7 +2,9 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <h2>Práctica 1 - Cifrador afin</h2>
+        <h2>
+          Práctica 0 - Implementación De Función Criptográfica (Cifrador afín)
+        </h2>
       </v-col>
       <v-col cols="12" lg="6" md="6" sm="6">
         <v-card class="elevation-0" rounded="lg">
@@ -27,11 +29,12 @@
                 </template>
                 <v-radio label="Inglés (26)" value="1"> </v-radio>
                 <v-radio label="Español (27)" value="2"> </v-radio>
+                <v-radio label="ASCII (256)" value="3"> </v-radio>
               </v-radio-group>
               <v-row>
                 <v-col cols="6">
                   <v-text-field
-                    v-model="alphaCifrar"
+                    v-model="alfaCifrar"
                     prepend-inner-icon="mdi-close-circle"
                     label="Factor multiplicativo (Alpha)"
                     type="number"
@@ -60,7 +63,8 @@
               <v-textarea
                 v-model="plaintext"
                 label="Contenido del archivo a cifrar"
-                auto-grow
+                no-resize
+                counter
                 rows="3"
                 outlined
                 readonly
@@ -68,13 +72,17 @@
 
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn type="submit" block color="primary" @click="verificar()"
+                <v-btn
+                  type="submit"
+                  block
+                  color="primary"
+                  @click="verificarCifrado()"
                   >Cifrar</v-btn
                 >
                 <v-spacer></v-spacer>
               </v-card-actions>
               <span class="d-flex align-center justify-center flex-wrap">
-                <span class="me-2">{{ mensajeCifrado }}</span>
+                <!-- <span class="me-2">{{ mensajeCifrado }}</span> -->
               </span>
             </v-card-text>
           </v-form>
@@ -103,11 +111,12 @@
                 </template>
                 <v-radio label="Inglés (26)" value="1"> </v-radio>
                 <v-radio label="Español (27)" value="2"> </v-radio>
+                <v-radio label="ASCII (256)" value="3"> </v-radio>
               </v-radio-group>
               <v-row>
                 <v-col cols="6">
                   <v-text-field
-                    v-model="alphaDescifrar"
+                    v-model="alfaDescifrar"
                     prepend-inner-icon="mdi-close-circle"
                     label="Factor multiplicativo (Alpha)"
                     type="number"
@@ -138,7 +147,8 @@
               <v-textarea
                 v-model="cifrado"
                 label="Contenido del archivo a descifrar"
-                auto-grow
+                no-resize
+                counter
                 rows="3"
                 readonly
                 outlined
@@ -156,7 +166,7 @@
                 <v-spacer></v-spacer>
               </v-card-actions>
               <span class="d-flex align-center justify-center flex-wrap">
-                <span class="me-2">{{ mensajeDescifrado }}</span>
+                <!-- <span class="me-2">{{ mensajeDescifrado }}</span> -->
               </span>
             </v-card-text>
           </v-form>
@@ -228,24 +238,25 @@ export default {
       "Z",
     ],
     alfabetoCifrar: "1",
-    alphaCifrar: 3,
+    alfaCifrar: 3,
     betaCifrar: 2,
     plaintext: "",
     mensajeCifrado: "",
 
     alfabetoDescifrar: "1",
-    alphaDescifrar: 3,
+    alfaDescifrar: 3,
     betaDescifrar: 2,
     cifrado: "",
     mensajeDescifrado: "",
 
+    nombreArchivo: "",
     contenidoArchivo: null,
 
     valid: true,
 
     reglasAlfa: [
       (v) => !!v || "Este campo es requerido",
-      (v) => (v && v > 0 && v < 27) || "Introduce un alfa valido",
+      (v) => (v && v > 0 && v < 256) || "Introduce un alfa valido",
     ],
     reglasBeta: [
       (v) => !!v || "Este campo es requerido",
@@ -259,23 +270,31 @@ export default {
   }),
 
   methods: {
-    verificar() {
+    verificarCifrado() {
       if (this.$refs.formCifrar.validate()) {
         let alfabeto = this.obtenerAlfabeto(this.alfabetoCifrar);
-        if (this.MCDeuclides(this.alphaCifrar, alfabeto.length) === 1) {
-          //pasamos el mensaje a minusculas y quitamos los espacios
+
+        /**
+         * Se calcula el MCD usando el algoritmo de euclides para verificar si el alfa ingresado
+         * es coprimo con el alfabeto escogido
+         * **/
+        if (this.MCDeuclides(this.alfaCifrar, alfabeto.length) === 1) {
+          //se obtiene el contenido del archivo a cifrar
           this.plaintext = this.contenidoArchivo;
-          console.log(this.plaintext);
 
-          let texto = this.plaintext.toUpperCase().replace(/\s+/g, "");
+          //si el alfabeto es ingles o español se quitan los espacios y se convierte a mayusculas
+          let texto = this.alfabetoCifrar === "3" ? this.plaintext : this.plaintext.toUpperCase().replace(/\s+/g, "");
 
+          //se cifra el texto utilizando el cifrador afin
           this.mensajeCifrado = this.cifrar(
-            parseInt(this.alphaCifrar),
+            parseInt(this.alfaCifrar),
             parseInt(this.betaCifrar),
             texto,
             alfabeto
           );
-          this.crearArchivo("cifrado.txt", this.mensajeCifrado);
+
+          //el resultado se guarda en un archivo txt el cual será la salida del cifrador
+          this.crearArchivo(this.nombreArchivo + "_C.txt", this.mensajeCifrado);
         } else {
           alert(
             "El factor multiplicativo de alfa no es valido ya que no es coprimo. Intenta con otro valor"
@@ -287,21 +306,33 @@ export default {
     verificarDescifrado() {
       if (this.$refs.formDescifrar.validate()) {
         let alfabeto = this.obtenerAlfabeto(this.alfabetoDescifrar);
-        if (this.MCDeuclides(this.alphaDescifrar, alfabeto.length) === 1) {
-          //pasamos el mensaje a minusculas y quitamos los espacios
+
+        /**
+         * Se calcula el MCD usando el algoritmo de euclides para verificar si el alfa ingresado
+         * es coprimo con el alfabeto escogido
+         * **/
+        if (this.MCDeuclides(this.alfaDescifrar, alfabeto.length) === 1) {
+          //posteriormente, calculamos el inverso multiplicativo de alfa utilizando el algoritmo extendido de euclides
           let alfaInversa = this.inversoMultiplicativoModular(
-            parseInt(this.alphaDescifrar),
+            parseInt(this.alfaDescifrar),
             alfabeto.length
           );
-          console.log(alfaInversa);
+          //se obtiene el contenido del archivo a descifrar
           this.cifrado = this.contenidoArchivo;
+
+          //se descifra el texto utilizando el cifrador afin
           this.mensajeDescifrado = this.descifrar(
             alfaInversa,
             parseInt(this.betaDescifrar),
             this.cifrado,
             alfabeto
           );
-          this.crearArchivo("descifrado.txt", this.mensajeDescifrado);
+          //si el alfabeto es ingles o español el mensaje se convierte a minusculas
+          if (this.alfabetoDescifrar != "3") {
+            this.mensajeDescifrado = this.mensajeDescifrado.toLowerCase();
+          }
+          //el resultado se guarda en un archivo txt el cual será la salida de descifrar el texto
+          this.crearArchivo(this.nombreArchivo + "_D.txt", this.mensajeDescifrado);
         } else {
           alert(
             "El inverso multiplicativo no existe para el valor de alfa dado. Intenta con otro valor"
@@ -311,7 +342,22 @@ export default {
     },
 
     obtenerAlfabeto(seleccion) {
-      return seleccion === "1" ? this.ingles : this.espanol;
+      switch (seleccion) {
+        case "1":
+          return this.ingles;
+        case "2":
+          return this.espanol;
+        case "3":
+          return this.obtenerASCII();
+      }
+    },
+
+    obtenerASCII() {
+      let a = [];
+      for (let i = 0; i < 256; ++i) {
+        a.push(String.fromCharCode(i));
+      }
+      return a;
     },
 
     cifrar(alfa, beta, mensaje, alfabeto) {
@@ -335,7 +381,7 @@ export default {
         }
         plaintext += alfabeto[transformacion];
       }
-      return plaintext.toLowerCase();
+      return plaintext;
     },
 
     MCDeuclides(a, b) {
@@ -358,23 +404,17 @@ export default {
       if (m == 1) return 0;
 
       while (a > 1) {
-        // q is quotient
         let q = parseInt(a / m);
         let t = m;
 
-        // m is remainder now,
-        // process same as
-        // Euclid's algo
         m = a % m;
         a = t;
         t = y;
 
-        // Update y and x
         y = x - q * y;
         x = t;
       }
 
-      // Make x positive
       if (x < 0) x += m0;
 
       return x;
@@ -385,10 +425,14 @@ export default {
         this.contenidoArchivo = "No File Chosen";
         return;
       }
+      this.nombreArchivo = archivo.name.substr(
+        0,
+        archivo.name.lastIndexOf(".")
+      );
+      //console.log(this.nombreArchivo)
+
       let reader = new FileReader();
 
-      // Use the javascript reader object to load the contents
-      // of the file in the v-model prop
       reader.readAsText(archivo);
       reader.onload = () => {
         this.contenidoArchivo = reader.result;
@@ -401,10 +445,14 @@ export default {
         this.contenidoArchivo = "No File Chosen";
         return;
       }
+      this.nombreArchivo = archivo.name.substr(
+        0,
+        archivo.name.lastIndexOf(".")
+      );
+      //console.log(this.nombreArchivo)
+
       let reader = new FileReader();
 
-      // Use the javascript reader object to load the contents
-      // of the file in the v-model prop
       reader.readAsText(archivo);
       reader.onload = () => {
         this.contenidoArchivo = reader.result;

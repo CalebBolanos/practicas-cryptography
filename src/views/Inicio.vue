@@ -6,7 +6,7 @@
           Prácticas de Cryptography
         </strong>
         <div class="text-center" style="color: #6a8bad; font-size: 1.6rem" >
-          Caleb Salomón Bolaños Ramos - 3CM14
+          Equipo 11 - 3CM14
         </div>
       </v-layout>
     </section>
@@ -20,11 +20,11 @@
             <v-row class="ma-0 pa-0" justify="center">
               <v-col cols="12">
                 <v-card-title class="text-no-wrap pt-1 ps-2">
-                  Practica 1
+                  Practica 0
                 </v-card-title>
-                <v-card-subtitle> Cifrador Afin </v-card-subtitle>
+                <v-card-subtitle>Implementación De Función Criptográfica (Cifrador Afín) </v-card-subtitle>
                 <v-card-actions>
-                  <v-btn color="primary" to="Practica1"> Ver más </v-btn>
+                  <v-btn color="primary" to="Practica0"> Ver más </v-btn>
                 </v-card-actions>
               </v-col>
             </v-row>

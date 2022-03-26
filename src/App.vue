@@ -5,11 +5,14 @@
       <v-row justify="center" no-gutters align="center">
         <v-col class="py-4 px-5 text-center white--text" cols="4">
           <strong>Prácticas de Cryptography</strong><br />
-          <strong>3CM14</strong>
+          <strong>3CM14</strong><br />
+          <strong>Equipo 11</strong>
         </v-col>
         <v-col class="py-4 white--text text-center" cols="4">
           <span>Hecho con ❤️ por:</span><br />
           <strong>Caleb Salomón Bolaños Ramos</strong><br />
+          <strong>García Marciano Edgar</strong><br />
+          <strong>Gutiérrez Gómez Yohan Leonardo</strong><br />
         </v-col>
         <v-col class="py-4 white--text text-center" cols="4">
           <v-btn v-for="icon in icons" :key="icon" class="mx-4" dark icon>

@@ -5,7 +5,7 @@
         <v-list-item-content style="text-align: center">
           <v-list-item-title class="titulo">Prácticas Crypto</v-list-item-title>
           <v-list-item-subtitle>
-            Caleb Bolaños Ramos - 3CM14
+            Equipo 11 - 3CM14
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -71,8 +71,8 @@ export default {
       },
       {
         icon: "mdi-tag",
-        text: "Práctica 1",
-        link: { name: "Practica1" },
+        text: "Práctica 0",
+        link: { name: "Practica0" },
       },
       
     ],
