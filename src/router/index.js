@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Practicas from '@/views/Practicas.vue'
 import Inicio from '@/views/Inicio.vue'
 import Practica0 from '@/views/practicas/Practica0.vue'
+import Practica1 from '@/views/practicas/Practica1.vue'
 
 Vue.use(VueRouter)
 
@@ -33,6 +34,14 @@ const routes = [
         component: Practica0,
         meta: {
           title: 'Práctica 0'
+        }
+      },
+      {
+        path: 'practica1',
+        name: 'Practica1',
+        component: Practica1,
+        meta: {
+          title: 'Práctica 1'
         }
       },
     ],

@@ -30,6 +30,21 @@
             </v-row>
           </v-card>
         </v-col>
+        <v-col cols="12" lg="6" md="6" sm="6">
+          <v-card elevation="0" rounded="lg">
+            <v-row class="ma-0 pa-0" justify="center">
+              <v-col cols="12">
+                <v-card-title class="text-no-wrap pt-1 ps-2">
+                  Practica 1
+                </v-card-title>
+                <v-card-subtitle>Cifrador por bloques (AES) </v-card-subtitle>
+                <v-card-actions>
+                  <v-btn color="primary" to="Practica1"> Ver más </v-btn>
+                </v-card-actions>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
       </v-row>
     </v-container>
   </div>

@@ -178,7 +178,7 @@
 
 <script>
 export default {
-  name: "PracticaUno",
+  name: "PracticaCero",
   data: () => ({
     ingles: [
       "A",
@@ -364,6 +364,7 @@ export default {
       let mensajeCifrado = "";
       for (let i = 0; i < mensaje.length; i++) {
         let posicionLetra = alfabeto.indexOf(mensaje[i]);
+        //C=ap+bmodn
         let transformacion = (alfa * posicionLetra + beta) % alfabeto.length;
         mensajeCifrado += alfabeto[transformacion];
       }
@@ -374,6 +375,7 @@ export default {
       let plaintext = "";
       for (let i = 0; i < mensajeCifrado.length; i++) {
         let posicionLetra = alfabeto.indexOf(mensajeCifrado[i]);
+        //P=a^-1(p+(-b))modn
         let transformacion =
           (alfaInversa * (posicionLetra - betaInversa)) % alfabeto.length;
         if (transformacion < 0) {

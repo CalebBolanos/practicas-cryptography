@@ -70,9 +70,14 @@ export default {
         link: { name: "Inicio" },
       },
       {
-        icon: "mdi-tag",
+        icon: "mdi-application-brackets-outline",
         text: "Práctica 0",
         link: { name: "Practica0" },
+      },
+      {
+        icon: "mdi-application-brackets-outline",
+        text: "Práctica 1",
+        link: { name: "Practica1" },
       },
       
     ],
