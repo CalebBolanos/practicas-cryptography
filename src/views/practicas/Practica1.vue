@@ -123,7 +123,7 @@ export default {
         //dependiendo de la imagen el tamaño de su header cambiara
         let headerBMP = this.contenidoArchivo.slice(0, 124);
         let contenidoBMP = this.contenidoArchivo.slice(
-          125,
+          124,
           this.contenidoArchivo.byteLength
         );
 
@@ -156,7 +156,10 @@ export default {
         mode: CryptoJS.mode.CBC,
       });
 
+      console.log(cifrado.toString())  
       let contenidoArchivo = new Blob([header, cifrado.toString()]);
+      console.log(contenidoArchivo.type)
+
 
       this.crearArchivo(this.nombreArchivo + "_eMODO.bmp", contenidoArchivo);
     },
@@ -178,9 +181,10 @@ export default {
             mode: CryptoJS.mode.CBC,
           }
         );
-        console.log(descifrado);
+        console.log(header.toString())
+        console.log(reader.result.toString());
         var typedArray = this.convertWordArrayToUint8Array(descifrado);
-        let archivoSalida = new Blob([header, typedArray]);
+        let archivoSalida = new Blob([header, typedArray],{ type: "image/bmp" });
 
         this.crearArchivo(this.nombreArchivo + "_dMODO.bmp", archivoSalida);
       };
