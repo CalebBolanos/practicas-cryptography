@@ -39,7 +39,7 @@
                 label="Archivo de entrada"
                 outlined
                 accept=".bmp"
-                @change="leerArchivoCifrar"
+                @change="leerArchivo"
                 :rules="reglasArchivo"
               ></v-file-input>
               <v-row>
@@ -86,6 +86,19 @@
 </template>
 
 <script>
+/**
+ * Practica 1
+ * 
+ * Este componente contiene la implementación de un cifrador por bloques (AES)
+ * utilizando la biblioteca CryptoJS
+ * 
+ * El componente puede cifrar y descifrar imagenes BMP (Windows bitmap) usando AES, 
+ * en los modos de operacion ECB, CBC, CFB, OFB, y dichas imagenes pueden ser 
+ * visualizadas por el usuario, tanto al estar cifradas como descifradas
+ * 
+ * Del mismo modo, se le pide al usuario especificar una llave y un vector de 
+ * inicializacion (c0) de 16 bytes para llevar a cabo el cifrado-descifrado de la imagen
+ */
 import CryptoJS from "crypto-js";
 export default {
   name: "PracticaUno",
@@ -108,25 +121,29 @@ export default {
       (v) => (v && v.size > 0) || "El archivo es requerido",
     ],
 
-    plaintext: null,
-    mensajeCifrado: "",
   }),
 
   methods: {
+    /**
+     * Funcion que se encarga de verificar y preparar los datos ingresados por el usuario 
+     * para cifrar o descifrar una imagen BMP usando AES.
+     */
     verificarCampos() {
-      if (this.$refs.formAES.validate()) {
+      if (this.$refs.formAES.validate()) {//si los datos del formulario son validos
         console.log("ok");
-
+        //se codifica en utf-8 el string de la llave y c0 para poder usarlos en AES
         this.llave = CryptoJS.enc.Utf8.parse(this.llaveString);
         this.c0 = CryptoJS.enc.Utf8.parse(this.c0String);
 
-        //dependiendo de la imagen el tamaño de su header cambiara
-        let headerBMP = this.contenidoArchivo.slice(0, 124);
-        let contenidoBMP = this.contenidoArchivo.slice(
-          124,
-          this.contenidoArchivo.byteLength
-        );
+        //dividimos el archivo original en dos partes
+        let headerBMP = this.contenidoArchivo.slice(0, 124);//parte del header del bmp, la cual se unira al resultado (dependiendo de la imagen el tamaño de su header cambiara)
+        let contenidoBMP = this.contenidoArchivo.slice(124,this.contenidoArchivo.byteLength);//contenido del archivo a cifrar o descifrar
 
+        /**
+         * finalmente, dependiendo del modo que seleccione el usuario, se cifrara o descifrara
+         * el contenido del bmp en funcion a la llave, c0 y modo de operacion especificado por 
+         * el usuario
+         */
         if (this.modo === "cifrar") {
           this.cifrarAES(
             headerBMP,
@@ -146,33 +163,63 @@ export default {
         }
       }
     },
-
+    
+    
+    /**
+     * funcion cifrarAES()
+     * 
+     * funcion que se encarga de cifrar un archivo bmp utilizando AES
+     * de tal forma que solo cifra el contenido de la imagen, para que despues 
+     * pueda ser visualizada.
+     * 
+     * Esta funcion recibe:
+     * @param {any} header es la cabecera del archivo BMP
+     * @param {any} input es el contenido del archivo BMP a cifrar
+     * @param {any} llave es la llave que se utilizara para cifrar (16 bytes)
+     * @param {any} c0 es el vector de inicializacion que se usara para cifrar (16 bytes)
+     * @param {any} modoOperacion el modo de operacion que usara el cifrador (ECB, CBC, CFB, OFB)
+     */
     cifrarAES(header, input, llave, c0, modoOperacion) {
-      console.log(modoOperacion);
-
+      console.log(modoOperacion)
+      //convertimos en wordArray el buffer del archivo para que CryptoJS pueda cifrarlo
       let wordArray = CryptoJS.lib.WordArray.create(input);
+      
+      //ciframos el contenido, especificando la llave, el vector de inicialización y el modo de operacion
       let cifrado = CryptoJS.AES.encrypt(wordArray, llave, {
         iv: c0,
         mode: CryptoJS.mode.CBC,
       });
 
-      console.log(cifrado.toString())  
+      //posteriormente, unimos el header original del archivo con el contenido cifrado en un blob para que pueda ser visualizado 
       let contenidoArchivo = new Blob([header, cifrado.toString()]);
-      console.log(contenidoArchivo.type)
-
-
+      //finalmente, se crea el archivo y se descarga en el dispositivo del usuario
       this.crearArchivo(this.nombreArchivo + "_eMODO.bmp", contenidoArchivo);
     },
 
+    /**
+     * funcion descifrarAES()
+     * 
+     * funcion que se encarga de descifrar un archivo bmp utilizando AES
+     * de tal forma que solo descifra el contenido de la imagen, y asi
+     * obtener la imagen original
+     * 
+     * Esta funcion recibe:
+     * @param {any} header es la cabecera del archivo BMP
+     * @param {any} input es el contenido del archivo BMP a descifrar
+     * @param {any} llave es la llave que se utilizara para cifrar (16 bytes)
+     * @param {any} c0 es el vector de inicializacion que se usara para cifrar (16 bytes)
+     * @param {any} modoOperacion el modo de operacion que usara el cifrador (ECB, CBC, CFB, OFB)
+     */
     descifrarAES(header, input, llave, c0, modoOperacion) {
       console.log(input, modoOperacion);
-
-      //let wordArray = CryptoJS.lib.WordArray.create();
-      //console.log(wordArray);
-
+      /**
+       * se crea un nuevo blob de la parte cifrada de la imagen para poder leer su 
+       * contenido utilizando un fileReader y de esta forma la biblioteca CryptoJS pueda descifrarlo
+       */
       let blob = new Blob([input], { type: "text/plain" });
       let reader = new FileReader();
       reader.onload = () => {
+        //desciframos el contenido, especificando la llave, el vector de inicialización y el modo de operacion
         let descifrado = CryptoJS.AES.decrypt(
           reader.result,
           llave,
@@ -181,25 +228,26 @@ export default {
             mode: CryptoJS.mode.CBC,
           }
         );
-        console.log(header.toString())
-        console.log(reader.result.toString());
+        //finalmente, convertimos el descifrado en un typedArray para poder escribir los binarios del archivo de salida
         var typedArray = this.convertWordArrayToUint8Array(descifrado);
+        //se crea el archivo de salida, juntando la cabecera original de la imagen junto con su contenido descifrado
         let archivoSalida = new Blob([header, typedArray],{ type: "image/bmp" });
-
+        //finalmente, se crea el archivo y se descarga en el dispositivo del usuario
         this.crearArchivo(this.nombreArchivo + "_dMODO.bmp", archivoSalida);
       };
       reader.readAsText(blob);
 
-      /** 
-      let reader = new FileReader();
-      reader.onload = () => {
-        
-      };
-      reader.readAsText(this.plaintext);
-      */
     },
 
-    leerArchivoCifrar(archivo) {
+    /**
+     * funcion leerArchivo()
+     * 
+     * funcion que se encarga de leer y obtener los datos del archivo de entrada 
+     * cada vez que es proporcionado por el usuario 
+     * @param {File} archivo es el archivo proporcionado por el usuario desde el
+     * <v-file-input/> 
+     */
+    leerArchivo(archivo) {
       //validacion de archivo de entrada
       if (!archivo) {
         this.contenidoArchivo = "No File Chosen";
@@ -210,20 +258,27 @@ export default {
         0,
         archivo.name.lastIndexOf(".")
       );
-
+      /**
+       * finalmente, el fileReader se encarga de obtener el contenido del 
+       * archivo en forma de un arrayBuffer el cual es guardado en contenidoArchivo
+       * el cual se usara posteriormente
+       */
       let reader = new FileReader();
-      if (this.modo === "cifrar") {
-        reader.readAsArrayBuffer(archivo);
-      } else {
-        reader.readAsArrayBuffer(archivo);
-      }
+      reader.readAsArrayBuffer(archivo);
       reader.onload = () => {
         this.contenidoArchivo = reader.result;
-        console.log(reader.result);
-        this.plaintext = archivo;
       };
     },
 
+    /**
+     * funcion crearArchivo()
+     * 
+     * Crea un archivo dado un nombre y su contenido en forma de blob, 
+     * el cual es guardado de forma automatica en la carpeta de Descargas del usuario
+     * 
+     * @param {String} nombreArchivo es el nombre del archivo
+     * @param {Blob} contenido es el contenido (binarios) del archivo
+     */
     crearArchivo(nombreArchivo, contenido) {
       let element = document.createElement("a");
 
@@ -239,6 +294,15 @@ export default {
       document.body.removeChild(element);
     },
 
+    /**
+     * funcion convertWordArrayToUint8Array()
+     * 
+     * convierte un wordArray(output de descifrado con CryptoJS) a Uint8Array para 
+     * que este pueda ser escrito dentro de un blob y asi crear el archivo descifrado
+     * 
+     * @param {any} wordArray es el output de CryptoJS a convertir
+     * @returns {Uint8Array} es el resultado de la conversion que se usara en un blob
+     */
     convertWordArrayToUint8Array(wordArray) {
       let arrayOfWords = Object.prototype.hasOwnProperty.call(
         wordArray,
