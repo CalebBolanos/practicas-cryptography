@@ -137,9 +137,9 @@ export default {
         this.c0 = CryptoJS.enc.Utf8.parse(this.c0String);
 
         //dividimos el archivo original en dos partes
-        let headerBMP = this.contenidoArchivo.slice(0, 124); //parte del header del bmp, la cual se unira al resultado (dependiendo de la imagen el tamaño de su header cambiara)
+        let headerBMP = this.contenidoArchivo.slice(0, 54); //parte del header del bmp, la cual se unira al resultado (dependiendo de la imagen el tamaño de su header cambiara)
         let contenidoBMP = this.contenidoArchivo.slice(
-          124,
+          54,
           this.contenidoArchivo.byteLength
         ); //contenido del archivo a cifrar o descifrar
         let modoOperacion;
