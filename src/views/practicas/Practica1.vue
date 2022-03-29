@@ -50,6 +50,7 @@
                     label="Llave (16 bytes)"
                     type="text"
                     outlined
+                    :rules="validar16Bytes"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="6">
@@ -60,6 +61,7 @@
                     type="text"
                     outlined
                     :disabled="modoOperacionString === 'ECB'"
+                    :rules="validar16Bytes"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -121,6 +123,9 @@ export default {
       (v) => !!v || "El archivo es requerido",
       (v) => (v && v.size > 0) || "El archivo es requerido",
     ],
+    validar16Bytes: [
+    (v)=> v.length>0 || "El input no puede estar vacío",
+    (v)=> v.length==16 || "Se requieren 16 bytes favor de verificar"],
   }),
 
   methods: {
