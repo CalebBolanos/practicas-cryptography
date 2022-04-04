@@ -103,6 +103,7 @@
  * inicializacion (c0) de 16 bytes para llevar a cabo el cifrado-descifrado de la imagen
  */
 import CryptoJS from "crypto-js";
+import {encode, decode} from "base64-arraybuffer";
 export default {
   name: "PracticaUno",
   data: () => ({
@@ -124,8 +125,9 @@ export default {
       (v) => (v && v.size > 0) || "El archivo es requerido",
     ],
     validar16Bytes: [
-    (v)=> v.length>0 || "El input no puede estar vacío",
-    (v)=> v.length==16 || "Se requieren 16 bytes favor de verificar"],
+      (v) => v.length > 0 || "El input no puede estar vacío",
+      (v) => v.length == 16 || "Se requieren 16 bytes favor de verificar",
+    ],
   }),
 
   methods: {
@@ -218,8 +220,10 @@ export default {
         });
       }
 
-      //posteriormente, unimos el header original del archivo con el contenido cifrado en un blob para que pueda ser visualizado
-      let contenidoArchivo = new Blob([header, cifrado.toString()]);
+      //luego, decodificamos el cifrado que esta en Base64 a ArrayBuffer para que se visualice el contenido
+      let arrayBufferCifrado = decode(cifrado.toString());
+      //posteriormente, unimos el header original del archivo con el contenido cifrado en un blob
+      let contenidoArchivo = new Blob([header, arrayBufferCifrado]);
       //finalmente, se crea el archivo y se descarga en el dispositivo del usuario
       this.crearArchivo(
         this.nombreArchivo + "_e" + this.modoOperacionString + ".bmp",
@@ -243,38 +247,35 @@ export default {
      */
     descifrarAES(header, input, llave, c0, modoOperacion) {
       /**
-       * se crea un nuevo blob de la parte cifrada de la imagen para poder leer su
-       * contenido utilizando un fileReader y de esta forma la biblioteca CryptoJS pueda descifrarlo
+       * primero codificamos la parte cifrada del bmp de ArrayBuffer a Base64 para que CryptoJS pueda 
+       * procesar el descifrado de forma correcta, ya que solo descifra Strings codificados en 
+       * Base64
        */
-      let blob = new Blob([input], { type: "text/plain" });
-      let reader = new FileReader();
-      reader.onload = () => {
-        //desciframos el contenido, especificando la llave, el vector de inicialización y el modo de operacion
-        let descifrado;
-        if (modoOperacion !== CryptoJS.mode.ECB) {
-          descifrado = CryptoJS.AES.decrypt(reader.result, llave, {
-            iv: c0,
-            mode: modoOperacion,
-          });
-        } else {
-          descifrado = CryptoJS.AES.decrypt(reader.result, llave, {
-            mode: modoOperacion,
-          });
-        }
-
-        //finalmente, convertimos el descifrado en un typedArray para poder escribir los binarios del archivo de salida
-        var typedArray = this.convertWordArrayToUint8Array(descifrado);
-        //se crea el archivo de salida, juntando la cabecera original de la imagen junto con su contenido descifrado
-        let archivoSalida = new Blob([header, typedArray], {
-          type: "image/bmp",
+      let cifradoBase64 = encode(input);
+      //desciframos el contenido, especificando la llave, el vector de inicialización y el modo de operacion
+      let descifrado;
+      if (modoOperacion !== CryptoJS.mode.ECB) {
+        descifrado = CryptoJS.AES.decrypt(cifradoBase64, llave, {
+          iv: c0,
+          mode: modoOperacion,
         });
-        //finalmente, se crea el archivo y se descarga en el dispositivo del usuario
-        this.crearArchivo(
-          this.nombreArchivo + "_d" + this.modoOperacionString + ".bmp",
-          archivoSalida
-        );
-      };
-      reader.readAsText(blob);
+      } else {
+        descifrado = CryptoJS.AES.decrypt(cifradoBase64, llave, {
+          mode: modoOperacion,
+        });
+      }
+
+      //finalmente, convertimos el descifrado en un typedArray para poder escribir los binarios del archivo de salida
+      var typedArray = this.convertWordArrayToUint8Array(descifrado);
+      //se crea el archivo de salida, juntando la cabecera original de la imagen junto con su contenido descifrado
+      let archivoSalida = new Blob([header, typedArray], {
+        type: "image/bmp",
+      });
+      //finalmente, se crea el archivo y se descarga en el dispositivo del usuario
+      this.crearArchivo(
+        this.nombreArchivo + "_d" + this.modoOperacionString + ".bmp",
+        archivoSalida
+      );
     },
 
     /**
