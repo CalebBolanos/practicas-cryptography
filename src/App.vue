@@ -10,7 +10,7 @@
         </v-col>
         <v-col class="py-4 white--text text-center" cols="4">
           <span>Hecho con ❤️ por:</span><br />
-          <strong>Caleb Salomón Bolaños Ramos</strong><br />
+          <strong>Bolaños Ramos Caleb Salomón</strong><br />
           <strong>García Marciano Edgar</strong><br />
           <strong>Gutiérrez Gómez Yohan Leonardo</strong><br />
         </v-col>
