@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <router-view></router-view>
-    <v-footer color="primary " padless absolute app>
+    <v-footer color="primary" padless>
       <v-row justify="center" no-gutters align="center">
         <v-col class="py-4 px-5 text-center white--text" cols="4">
           <strong>Prácticas de Cryptography</strong><br />
