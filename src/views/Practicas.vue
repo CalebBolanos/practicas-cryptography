@@ -79,6 +79,11 @@ export default {
         text: "Práctica 1",
         link: { name: "Practica1" },
       },
+      {
+        icon: "mdi-application-brackets-outline",
+        text: "Práctica 2",
+        link: { name: "Practica2" },
+      },
       
     ],
     seleccionado: 0,
