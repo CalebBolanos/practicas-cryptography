@@ -177,8 +177,8 @@
                   type="submit"
                   block
                   color="primary"
-                  @click="verificarCampos()"
-                  >Firmar</v-btn
+                  @click="validarCamposVerificacion()"
+                  >Verificar</v-btn
                 >
                 <v-spacer></v-spacer>
               </v-card-actions>
@@ -197,6 +197,7 @@
 <script>
 import rsa from "js-crypto-rsa";
 import keyutil from "js-crypto-key-utils";
+import { encode, decode } from "base64-arraybuffer";
 
 export default {
   name: "PracticaDos",
@@ -214,6 +215,7 @@ export default {
     llavePemPublica: null,
     llavePublica: null,
     archivoFirmado: null,
+    firmaArchivo: null,
 
     reglasArchivo: [
       (v) => !!v || "El archivo es requerido",
@@ -261,6 +263,21 @@ export default {
 
       element.click();
 
+      document.body.removeChild(element);
+    },
+
+    generarArchivo(nombreArchivo, contenido) {
+      let element = document.createElement("a");
+
+      let url = window.URL.createObjectURL(contenido);
+      element.href = url;
+      element.setAttribute("download", nombreArchivo);
+
+      element.style.display = "none";
+      document.body.appendChild(element);
+
+      element.click();
+      window.URL.revokeObjectURL(url);
       document.body.removeChild(element);
     },
 
@@ -322,7 +339,8 @@ export default {
     },
 
     firmarArchivo() {
-      rsa.sign(this.archivoOriginal, this.llavePrivada, "SHA-256", {
+      rsa
+        .sign(this.archivoOriginal, this.llavePrivada, "SHA-256", {
           // optional
           name: "RSA-PSS", // default. 'RSASSA-PKCS1-v1_5' is also available.
           saltLength: 64,
@@ -330,15 +348,15 @@ export default {
         .then((firma) => {
           console.log("firmado");
           console.log(firma);
-
-          return rsa.verify(this.archivoOriginal, firma, this.llavePublica, "SHA-256", {
-            // optional
-            name: "RSA-PSS", // default. 'RSASSA-PKCS1-v1_5' is also available.
-            saltLength: 64, // default is the same as hash length
-          });
-        })
-        .then((valid) => {
-          console.log(valid)
+          let firmaBase64 = encode(firma);
+          let contenidoArchivo = new Blob(
+            [this.archivoOriginal, "\n-#-#-#FIRMA-#-#-#\n", firmaBase64],
+            {
+              type: "text/plain",
+            }
+          );
+          console.log(contenidoArchivo);
+          this.generarArchivo("firma.txt", contenidoArchivo);
         });
     },
 
@@ -363,9 +381,13 @@ export default {
        * el cual se usara posteriormente
        */
       let reader = new FileReader();
-      reader.readAsArrayBuffer(archivo);
+      reader.readAsText(archivo);
       reader.onload = () => {
-        this.archivoFirmado = reader.result;
+        let input = reader.result;
+        let partes = input.split("\n-#-#-#FIRMA-#-#-#\n");
+        this.archivoFirmado = new TextEncoder("utf-8").encode(partes[0]);
+        this.firmaArchivo = decode(partes[1]);
+        console.log(this.firmaArchivo);
       };
     },
 
@@ -390,6 +412,31 @@ export default {
           (jwk) => (this.llavePublica = jwk)
         );
       };
+    },
+
+    validarCamposVerificacion() {
+      if (this.$refs.formVerificacion.validate()) {
+        console.log("lleno");
+        this.verificarArchivo();
+      }
+    },
+
+    verificarArchivo() {
+      rsa
+        .verify(
+          this.archivoFirmado,
+          this.firmaArchivo,
+          this.llavePublica,
+          "SHA-256",
+          {
+            // optional
+            name: "RSA-PSS", // default. 'RSASSA-PKCS1-v1_5' is also available.
+            saltLength: 64, // default is the same as hash length
+          }
+        )
+        .then((valid) => {
+          console.log(valid);
+        });
     },
 
     async convertirPEMaJWK(stringPem) {
