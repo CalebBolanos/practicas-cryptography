@@ -31,21 +31,6 @@
 
       <v-spacer></v-spacer>
 
-      <v-menu left bottom>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn icon v-bind="attrs" v-on="on">
-            <v-avatar size="36">
-              <v-icon dark>mdi-account-circle</v-icon>
-            </v-avatar>
-          </v-btn>
-        </template>
-
-        <v-list>
-          <v-list-item>
-            <v-list-item-title>Cerrar Sesion</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
     </v-app-bar>
 
     <!-- Sizes your content based upon application components -->

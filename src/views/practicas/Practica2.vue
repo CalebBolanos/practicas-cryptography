@@ -24,8 +24,7 @@
               <span class="text-h5">Generar llaves</span>
             </v-card-title>
             <v-card-text>
-              Puedes descargar las llaves generadas dando clic al botón de
-              guardar
+              Puedes descargar las llaves generadas dando clic a sus respectivos botones
             </v-card-text>
             <v-card-text>
               <v-container>
@@ -95,7 +94,7 @@
             <h2 class="text-2xl font-weight-semibold">Firma</h2>
           </v-card-title>
           <v-card-text>
-            <p class="text--primary mb-1">descripción:</p>
+            <p class="text--primary mb-1">Puedes firmar un archivo de entrada dados los siguientes parámetros:</p>
           </v-card-text>
           <v-form
             ref="formFirma"
@@ -115,6 +114,7 @@
               <v-file-input
                 label="Llave privada del emisor"
                 outlined
+                prepend-icon="mdi-key"
                 accept=".txt"
                 @change="leerLlavePrivada"
                 :rules="reglasArchivo"
@@ -127,13 +127,30 @@
                   block
                   color="primary"
                   @click="verificarCampos()"
-                  >Firmar</v-btn
+                  >Firmar Archivo</v-btn
                 >
                 <v-spacer></v-spacer>
               </v-card-actions>
-              <span class="d-flex align-center justify-center flex-wrap">
-                <!-- <span class="me-2">{{ mensajeCifrado }}</span> -->
-              </span>
+              <v-snackbar
+                v-model="snackbar"
+                :color="colorSnackbar"
+                text
+                elevation="24"
+                :timeout="timeout"
+              >
+                {{ infoSnackbar }}
+
+                <template v-slot:action="{ attrs }">
+                  <v-btn
+                    :color="colorSnackbar"
+                    text
+                    v-bind="attrs"
+                    @click="snackbar = false"
+                  >
+                    Cerrar
+                  </v-btn>
+                </template>
+              </v-snackbar>
             </v-card-text>
           </v-form>
         </v-card>
@@ -146,7 +163,7 @@
             <h2 class="text-2xl font-weight-semibold">Verificación</h2>
           </v-card-title>
           <v-card-text>
-            <p class="text--primary mb-1">descripción:</p>
+            <p class="text--primary mb-1">Ingresa los siguientes parámetros para verificar la firma digital y la integridad del mensaje de un archivo previamente firmado:</p>
           </v-card-text>
           <v-form
             ref="formVerificacion"
@@ -166,6 +183,7 @@
               <v-file-input
                 label="Llave pública del emisor"
                 outlined
+                prepend-icon="mdi-key"
                 accept=".txt"
                 @change="leerLlavePublica"
                 :rules="reglasArchivo"
@@ -178,7 +196,7 @@
                   block
                   color="primary"
                   @click="validarCamposVerificacion()"
-                  >Verificar</v-btn
+                  >Verificar Archivo</v-btn
                 >
                 <v-spacer></v-spacer>
               </v-card-actions>
@@ -210,12 +228,18 @@ export default {
     llavePemPrivada: null,
     llavePrivada: null,
     archivoOriginal: null,
+    nombreArchivo: "",
 
     validVerificacion: true,
     llavePemPublica: null,
     llavePublica: null,
     archivoFirmado: null,
     firmaArchivo: null,
+
+    snackbar: false,
+    infoSnackbar: "",
+    colorSnackbar: "",
+    timeout: 5000,
 
     reglasArchivo: [
       (v) => !!v || "El archivo es requerido",
@@ -302,6 +326,10 @@ export default {
         this.archivoOriginal = "No File Chosen";
         return;
       }
+      this.nombreArchivo = archivo.name.substr(
+        0,
+        archivo.name.lastIndexOf(".")
+      );
 
       /**
        * finalmente, el fileReader se encarga de obtener el contenido del
@@ -356,7 +384,7 @@ export default {
             }
           );
           console.log(contenidoArchivo);
-          this.generarArchivo("firma.txt", contenidoArchivo);
+          this.generarArchivo(this.nombreArchivo + "_s.txt", contenidoArchivo);
         });
     },
 
@@ -435,7 +463,9 @@ export default {
           }
         )
         .then((valid) => {
-          console.log(valid);
+          this.snackbar = true;
+          this.infoSnackbar = valid ? "La firma proporcionada en el archivo es valida" : "La firma o mensaje proporcionado en el archivo no son validos";
+          this.colorSnackbar = valid ? "green accent-4" : "error"
         });
     },
 
