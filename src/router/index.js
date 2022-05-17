@@ -5,6 +5,7 @@ import Inicio from '@/views/Inicio.vue'
 import Practica0 from '@/views/practicas/Practica0.vue'
 import Practica1 from '@/views/practicas/Practica1.vue'
 import Practica2 from '@/views/practicas/Practica2.vue'
+import Practica3 from '@/views/practicas/Practica3.vue'
 
 Vue.use(VueRouter)
 
@@ -51,6 +52,14 @@ const routes = [
         component: Practica2,
         meta: {
           title: 'Práctica 2'
+        }
+      },
+      {
+        path: 'practica3',
+        name: 'Practica3',
+        component: Practica3,
+        meta: {
+          title: 'Práctica 3'
         }
       },
     ],

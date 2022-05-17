@@ -12,6 +12,7 @@
     "core-js": "^3.8.3",
     "crypto-browserify": "^3.12.0",
     "crypto-js": "^4.1.1",
+    "firebase": "^9.8.1",
     "js-crypto-key-utils": "^1.0.4",
     "js-crypto-rsa": "^1.0.4",
     "register-service-worker": "^1.7.2",
