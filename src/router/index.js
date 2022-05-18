@@ -6,6 +6,9 @@ import Practica0 from '@/views/practicas/Practica0.vue'
 import Practica1 from '@/views/practicas/Practica1.vue'
 import Practica2 from '@/views/practicas/Practica2.vue'
 import Practica3 from '@/views/practicas/Practica3.vue'
+import Registro from '@/views/practicas/practica3/Registro.vue'
+import ContrasenaOlvidada from '@/views/practicas/practica3/ContrasenaOlvidada.vue'
+import SesionIniciada from '@/views/practicas/practica3/SesionIniciada.vue'
 
 Vue.use(VueRouter)
 
@@ -64,6 +67,38 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/practicas/practica3',
+    component: Practicas,
+    children:[
+      {
+        path: 'registro',
+        name: 'Registro',
+        component: Registro,
+        meta: {
+          title: 'Registro'
+        }
+      },
+      {
+        path: 'contrasenaOlvidada',
+        name: 'ContrasenaOlvidada',
+        component: ContrasenaOlvidada,
+        meta: {
+          title: 'Contraseña Olvidada'
+        }
+      },
+      {
+        path: 'sesionIniciada',
+        name: 'SesionIniciada',
+        component: SesionIniciada,
+        props: true,
+        meta: {
+          title: 'Sesion Iniciada'
+        }
+      },
+    ]
+  },
+
 ]
 
 const router = new VueRouter({
