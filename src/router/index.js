@@ -9,6 +9,7 @@ import Practica3 from '@/views/practicas/Practica3.vue'
 import Registro from '@/views/practicas/practica3/Registro.vue'
 import ContrasenaOlvidada from '@/views/practicas/practica3/ContrasenaOlvidada.vue'
 import SesionIniciada from '@/views/practicas/practica3/SesionIniciada.vue'
+import RestablecerContrasena from '@/views/practicas/practica3/RestablecerContrasena.vue'
 
 Vue.use(VueRouter)
 
@@ -94,6 +95,15 @@ const routes = [
         props: true,
         meta: {
           title: 'Sesion Iniciada'
+        }
+      },
+      {
+        path: 'restablecerContrasena/:idUsuario',
+        name: 'RestablecerContrasena',
+        component: RestablecerContrasena,
+        props: true,
+        meta: {
+          title: 'Restablecer Contrasena'
         }
       },
     ]

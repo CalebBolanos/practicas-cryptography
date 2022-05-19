@@ -9,11 +9,7 @@ import "firebase/compat/firestore";
 
 Vue.config.productionTip = false
 
-new Vue({
-  vuetify,
-  router,
-  render: h => h(App)
-}).$mount('#app')
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAGXGa_rJaAh8UaYvAxLS7ciEknjhIX-hk",
@@ -29,3 +25,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 export const db = firebase.firestore()
 
+new Vue({
+  vuetify,
+  router,
+  render: h => h(App)
+}).$mount('#app')
