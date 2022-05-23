@@ -87,7 +87,7 @@ export default {
 
   methods: {
     login() {
-      alert("si");
+      //alert("si");
       db.collection("usuarios")
         .where("correo", "==", this.correo)
         .get()
